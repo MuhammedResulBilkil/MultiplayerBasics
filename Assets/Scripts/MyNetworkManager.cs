@@ -3,20 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MyNetworkManager : NetworkManager
 {
-    public override void OnClientConnect()
-    {
-        base.OnClientConnect();
-        
-        Debug.Log("Client connected!");
-    }
-
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
         base.OnServerAddPlayer(conn);
+
+        MyNetworkPlayer player = conn.identity.GetComponent<MyNetworkPlayer>();
         
-        Debug.Log($"There are {numPlayers} players now!");
+        player.SetPlayerDisplayName($"Player {numPlayers}");
+        player.SetPlayerColor(Random.ColorHSV());
     }
 }
