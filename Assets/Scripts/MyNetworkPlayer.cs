@@ -12,6 +12,8 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SyncVar(hook = nameof(HandleUpdatePlayerDisplayText))] [SerializeField] private string _playerDisplayName = "Missing Name";
     [SyncVar(hook = nameof(HandleUpdatePlayerColor))] [SerializeField] private Color _playerColor = Color.white;
 
+    #region Server
+
     [Server]
     public void SetPlayerDisplayName(string newPlayerDisplayName)
     {
@@ -24,6 +26,19 @@ public class MyNetworkPlayer : NetworkBehaviour
         _playerColor = newColor;
     }
 
+    [Command]
+    private void CmdSetPlayerDisplayName(string newPlayerDisplayName)
+    {
+        RpcLogPlayerDisplayName(newPlayerDisplayName);
+        
+        SetPlayerDisplayName(newPlayerDisplayName);
+    }
+
+    #endregion
+    
+    
+    #region Client
+
     private void HandleUpdatePlayerColor(Color oldColor, Color newColor)
     {
         _playerRenderer.material.SetColor("_BaseColor", newColor);
@@ -33,4 +48,19 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         _playerDisplayText.text = newDisplayName;
     }
+
+    [ContextMenu("Set My Name")]
+    private void SetMyName()
+    {
+        CmdSetPlayerDisplayName("My Missing Name");
+    }
+    
+    [ClientRpc]
+    private void RpcLogPlayerDisplayName(string newPlayerDisplayName)
+    {
+        Debug.Log($"Player New Name = {newPlayerDisplayName}");
+    }
+
+    #endregion
+    
 }
